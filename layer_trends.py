@@ -24,7 +24,7 @@ def apply_windowing(layer_data: list[float], window_size: int):
 
     return window_results
 
-def plot_layer_data(title: str, ylabel: str, data: list[float], output_path: str):
+def plot_layer_data(title: str, ylabel: str, data: list[float], output_path: str, layer_window_size: int = 1):
     plt.clf()
 
     plt.figure(figsize=(10, 8))
@@ -32,11 +32,27 @@ def plot_layer_data(title: str, ylabel: str, data: list[float], output_path: str
     plt.xlabel("Layer Index", labelpad=20)
     plt.ylabel(ylabel, labelpad=20)
     plt.axhline(y=0, color='black', linestyle='--')
-    plt.grid(True, which='both', color='lightgray')
-    plt.minorticks_on()
+    plt.grid(True, axis='both', color='lightgray')
 
     plt.plot(range(len(data)), data)
 
+    if layer_window_size > 1:
+        plt.xticks(
+            ticks=range(len(data)),
+            labels=[f"{i + 1}-{i + layer_window_size}" for i in range(len(data))],
+            rotation=45,
+            ha="right"
+        )
+
+    else:
+        plt.xticks(
+            ticks=range(len(data)),
+            labels=range(1, len(data) + 1),
+            rotation=45,
+            ha="right"
+        )
+
+    plt.tight_layout()
     plt.savefig(output_path)
     plt.close()
 

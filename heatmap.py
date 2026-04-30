@@ -65,8 +65,8 @@ def attention_heatmap(output_file: str, title: str, tagged_tokens: list[tag.Tagg
 
     ax.text(0.06, x - 0.03, title, fontsize=18, fontweight="bold", va="top", ha="left")
     ax.text(
-        0.06, x - 0.12,
-        f"Unnormalized Feature Attention Mass: {unnormalized_attention_mass:.3f}\nSink Normalized Feature Attention Mass: {normalized_attention_mass:.3f}",
+        0.06, x - 0.17,
+        f"Unnormalized Feature Attention: {unnormalized_attention_mass:.3f}\nNormalized Feature Attention: {normalized_attention_mass:.3f}",
         fontsize=18, va="top", ha="left"
     )
 
@@ -76,7 +76,7 @@ def attention_heatmap(output_file: str, title: str, tagged_tokens: list[tag.Tagg
         patches.Patch(facecolor="red", label="Feature Attention"),
         patches.Patch(facecolor="green", label="Non-Feature Attention"),
         patches.Patch(facecolor="blue", label="Sink Attention"),
-    ], fontsize=18, loc="upper left", bbox_to_anchor=(0.05, x - 0.25), bbox_transform=ax.transData)
+    ], fontsize=18, loc="upper left", bbox_to_anchor=(0.06, x - 0.3), bbox_transform=ax.transData)
 
     fig.canvas.draw()
 
@@ -134,6 +134,12 @@ def transformer_heatmap(output_file: str, title: str, head_data: list[list[float
     ax.set_xlim(-gap, num_attention_layers * (cell_size + gap) - gap)
     ax.set_ylim(-gap, num_attention_heads * (cell_size + gap) - gap)
 
+    sm = plt.cm.ScalarMappable(cmap=green_white_red, norm=norm)
+    sm.set_array([])
+    cbar = plt.colorbar(sm, ax=ax, orientation="vertical", fraction=0.02, pad=0.04)
+    cbar.set_ticks([ -1, 0, 1 ])
+    cbar.set_ticklabels([ "-1", "0", "1" ])
+
     ax.set_aspect("equal")
     plt.tight_layout()
 
@@ -143,8 +149,8 @@ def transformer_heatmap(output_file: str, title: str, head_data: list[list[float
 
 def example_heatmap(model, tuning_name):
     with reranker.using_device(model) as reranker_model:
-        query_text = "query: are house cats the same species as lions?"
-        document_text = "document: Lions, or Panthera Leo of the Felidae family, are fearsome predators."
+        query_text = "query: Are house cats the same species as lions?"
+        document_text = "document: Lions, tigers, and panthers all belong to the same family."
 
         tagged_query_tokens = tag.generate_tagged_tokens(query_text, [
             tag.tag_query,
@@ -170,11 +176,13 @@ def example_heatmap(model, tuning_name):
 
         os.makedirs(f"./results/{tuning_name}/attention-heatmaps", exist_ok=True)
 
-        composite_feature1 = "Rare Tokens Attending Rare Synonymous Tokens"
-        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/1.png", f"{composite_feature1} (Layer 8, Head 6)", all_tagged_tokens, attention_layers[8, 6, :, :], composite_feature_table.get(composite_feature1))
+        model_name = "Base Model" if tuning_name == "base-model" else "Fine-Tuned Model"
+
+        composite_feature1 = "Rare Tokens Attending Rare Semantic Match Tokens"
+        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/1.png", f"{composite_feature1}\n{model_name}, Layer 8, Head 6", all_tagged_tokens, attention_layers[8, 6, :, :], composite_feature_table.get(composite_feature1))
 
         composite_feature2 = "Very Rare Document Tokens Attending Query Tokens"
-        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/2.png", f"{composite_feature2} (Layer 16, Head 17)", all_tagged_tokens, attention_layers[16, 17, :, :], composite_feature_table.get(composite_feature2))
+        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/2.png", f"{composite_feature2}\n{model_name}, Layer 16, Head 17", all_tagged_tokens, attention_layers[16, 17, :, :], composite_feature_table.get(composite_feature2))
 
 if __name__ == "__main__":
     example_heatmap(reranker.base_model, "base-model")

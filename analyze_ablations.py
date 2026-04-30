@@ -59,7 +59,7 @@ def normalize_head_data(head_data: list[list[float]]):
 
     return [[ value / max_abs for value in layer ] for layer in head_data]
 
-def analyze_single_head_ablations():
+def analyze_omit_single_head_ablations():
     evaluation_metric_control_values = analyze_ablation("results/ablation/none.json")
 
     evaluation_metric_heatmaps = {
@@ -77,18 +77,18 @@ def analyze_single_head_ablations():
             for evaluation_metric, metric_score in evaluation_metric_scores.items():
                 evaluation_metric_heatmaps[evaluation_metric][-1].append(metric_score - evaluation_metric_control_values[evaluation_metric])
 
-    os.makedirs("results/ablation-analysis/head", exist_ok=True)
+    os.makedirs("results/ablation-analysis/omit-head", exist_ok=True)
 
     for evaluation_metric, metric_heatmap in evaluation_metric_heatmaps.items():
         transformer_heatmap(
-            f"results/ablation-analysis/head/{evaluation_metric}.png",
-            f"Average Increase in {evaluation_metric} Loss\nWith Single Head Ablation",
+            f"results/ablation-analysis/omit-head/{evaluation_metric}.png",
+            f"Average Increase in {evaluation_metric} Loss\nWith Single Head Omit Ablation",
             normalize_head_data(metric_heatmap)
         )
 
 # TODO: abstract the following analysis routines better
 
-def analyze_single_layer_ablations():
+def analyze_omit_single_layer_ablations():
     evaluation_metric_control_values = analyze_ablation("results/ablation/none.json")
 
     evaluation_metric_progressions = {
@@ -102,17 +102,17 @@ def analyze_single_layer_ablations():
         for evaluation_metric, metric_score in evaluation_metric_scores.items():
             evaluation_metric_progressions[evaluation_metric].append(metric_score - evaluation_metric_control_values[evaluation_metric])
 
-    os.makedirs("results/ablation-analysis/layer", exist_ok=True)
+    os.makedirs("results/ablation-analysis/omit-layer", exist_ok=True)
 
     for evaluation_metric in evaluation_metrics.keys():
-        with open(f"results/ablation-analysis/layer/{evaluation_metric}.json", "w") as metric_progressions_file:
+        with open(f"results/ablation-analysis/omit-layer/{evaluation_metric}.json", "w") as metric_progressions_file:
             json.dump(evaluation_metric_progressions[evaluation_metric], metric_progressions_file)
 
         layer_trends.plot_layer_data(
-            f"Average Increase in {evaluation_metric} Loss\nWith Single Layer Ablation",
+            f"Average Increase in {evaluation_metric} Loss\nWith Single Layer Omit Ablation",
             f"Average Increase in {evaluation_metric} Loss",
             evaluation_metric_progressions[evaluation_metric],
-            f"results/ablation-analysis/layer/{evaluation_metric}.png"
+            f"results/ablation-analysis/omit-layer/{evaluation_metric}.png"
         )
 
 def analyze_keep_single_layer_ablations():
@@ -136,13 +136,13 @@ def analyze_keep_single_layer_ablations():
             json.dump(evaluation_metric_progressions[evaluation_metric], metric_progressions_file)
 
         layer_trends.plot_layer_data(
-            f"Average Increase in {evaluation_metric} Loss\nWith All But Single Layer Ablation",
+            f"Average Increase in {evaluation_metric} Loss\nWith Single Layer Keep Ablation",
             f"Average Increase in {evaluation_metric} Loss",
             evaluation_metric_progressions[evaluation_metric],
             f"results/ablation-analysis/keep-layer/{evaluation_metric}.png"
         )
 
-def analyze_window_ablations():
+def analyze_omit_window_ablations():
     evaluation_metric_control_values = analyze_ablation("results/ablation/none.json")
 
     layer_window_sizes = [ 2, 3, 4, 6 ]
@@ -159,17 +159,18 @@ def analyze_window_ablations():
             for evaluation_metric, metric_score in evaluation_metric_scores.items():
                 evaluation_metric_progressions[evaluation_metric].append(metric_score - evaluation_metric_control_values[evaluation_metric])
 
-        os.makedirs(f"results/ablation-analysis/window/size{layer_window_size}", exist_ok=True)
+        os.makedirs(f"results/ablation-analysis/omit-window/size{layer_window_size}", exist_ok=True)
 
         for evaluation_metric in evaluation_metrics.keys():
-            with open(f"results/ablation-analysis/window/size{layer_window_size}/{evaluation_metric}.json", "w") as metric_progressions_file:
+            with open(f"results/ablation-analysis/omit-window/size{layer_window_size}/{evaluation_metric}.json", "w") as metric_progressions_file:
                 json.dump(evaluation_metric_progressions[evaluation_metric], metric_progressions_file)
 
             layer_trends.plot_layer_data(
-                f"Average Increase in {evaluation_metric} Loss\nWith {layer_window_size} Layer Window Ablation",
+                f"Average Increase in {evaluation_metric} Loss\nWith {layer_window_size} Layer Window Omit Ablation",
                 f"Average Increase in {evaluation_metric} Loss",
                 evaluation_metric_progressions[evaluation_metric],
-                f"results/ablation-analysis/window/size{layer_window_size}/{evaluation_metric}.png"
+                f"results/ablation-analysis/omit-window/size{layer_window_size}/{evaluation_metric}.png",
+                layer_window_size=layer_window_size
             )
 
 def analyze_keep_window_ablations():
@@ -196,16 +197,18 @@ def analyze_keep_window_ablations():
                 json.dump(evaluation_metric_progressions[evaluation_metric], metric_progressions_file)
 
             layer_trends.plot_layer_data(
-                f"Average Increase in {evaluation_metric} Loss\nWith All But {layer_window_size} Layer Window Ablation",
+                f"Average Increase in {evaluation_metric} Loss\nWith {layer_window_size} Layer Window Keep Ablation",
                 f"Average Increase in {evaluation_metric} Loss",
                 evaluation_metric_progressions[evaluation_metric],
-                f"results/ablation-analysis/keep-window/size{layer_window_size}/{evaluation_metric}.png"
+                f"results/ablation-analysis/keep-window/size{layer_window_size}/{evaluation_metric}.png",
+                layer_window_size=layer_window_size
             )
 
 if __name__ == "__main__":
-    # analyze_single_head_ablations()
+    # TODO: different eval set, i probably need to redo head evals (sigh)
+    analyze_omit_single_head_ablations()
 
-    analyze_single_layer_ablations()
+    analyze_omit_single_layer_ablations()
     analyze_keep_single_layer_ablations()
-    analyze_window_ablations()
+    analyze_omit_window_ablations()
     analyze_keep_window_ablations()

@@ -100,17 +100,19 @@ def poll_attention_mass(model, tuning_name: str):
             with open(f"results/{tuning_name}/transformer-heatmaps/{feature}/normalized.json", "w") as f:
                 json.dump(norm_list, f, indent=4)
 
-            transformer_heatmap(
-                f"results/{tuning_name}/transformer-heatmaps/{feature}/unnormalized.png",
-                f"{feature}\n(Unnormalized Attention Mass)",
-                unnorm_list
-            )
+            # visuals moved to calculate model diffs
 
-            transformer_heatmap(
-                f"results/{tuning_name}/transformer-heatmaps/{feature}/normalized.png",
-                f"{feature}\n(Normalized Attention Mass)",
-                norm_list
-            )
+            # transformer_heatmap(
+            #     f"results/{tuning_name}/transformer-heatmaps/{feature}/unnormalized.png",
+            #     f"{feature}\n(Unnormalized Feature Attention)",
+            #     unnorm_list
+            # )
+
+            # transformer_heatmap(
+            #     f"results/{tuning_name}/transformer-heatmaps/{feature}/normalized.png",
+            #     f"{feature}\n(Normalized Feature Attention)",
+            #     norm_list
+            # )
 
 if __name__ == "__main__":
     poll_attention_mass(reranker.base_model, "base-model")

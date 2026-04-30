@@ -87,10 +87,10 @@ attention_feature_groups = {
     ],
     "similarity": [
         AttentionFeature(),
-        AttentionFeature(attended="Matching Word", filters=[
+        AttentionFeature(attended="Lexical Match", filters=[
             tag.filter_combination(tag.are_exact_word_match)
         ]),
-        AttentionFeature(attended="Synonymous", filters=[
+        AttentionFeature(attended="Semantic Match", filters=[
             tag.filter_combination(tag.are_synonyms)
         ])
     ],
