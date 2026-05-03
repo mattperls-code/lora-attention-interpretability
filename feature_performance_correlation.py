@@ -7,11 +7,11 @@ if __name__ == "__main__":
     model_data_paths = [ "base-model", "ft-model", "model-diffs" ]
 
     ablation_categories = [
-        ("layer", "layer"),
-        ("window/size2", "window-size2"),
-        ("window/size3", "window-size3"),
-        ("window/size4", "window-size4"),
-        ("window/size6", "window-size6"),
+        ("omit-layer", "layer"),
+        ("omit-window/size2", "window-size2"),
+        ("omit-window/size3", "window-size3"),
+        ("omit-window/size4", "window-size4"),
+        ("omit-window/size6", "window-size6"),
         ("keep-layer", "layer"),
         ("keep-window/size2", "window-size2"),
         ("keep-window/size3", "window-size3"),

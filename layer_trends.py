@@ -61,44 +61,52 @@ if __name__ == "__main__":
 
     for model_data_path in model_data_paths:
         for feature_name in os.listdir(f"results/{model_data_path}/transformer-heatmaps"):
-            os.makedirs(f"results/{model_data_path}/layers/{feature_name}", exist_ok=True)
+            if os.path.isdir(f"results/{model_data_path}/transformer-heatmaps/{feature_name}"):
+                os.makedirs(f"results/{model_data_path}/layers/{feature_name}", exist_ok=True)
 
-            feature_data_path = f"results/{model_data_path}/transformer-heatmaps/{feature_name}/normalized.json"
+                feature_data_path = f"results/{model_data_path}/transformer-heatmaps/{feature_name}/normalized.json"
 
-            feature_layer_data = from_heatmap_file(feature_data_path)
+                feature_layer_data = from_heatmap_file(feature_data_path)
 
-            with open(f"results/{model_data_path}/layers/{feature_name}/layer.json", "w") as layer_data_file:
-                json.dump(feature_layer_data, layer_data_file)
-
-            plot_layer_data(
-                f"{feature_name}\n(Average Normalized Attention Mass Per Layer)",
-                "Average Normalized Attention Mass Per Layer",
-                feature_layer_data,
-                f"results/{model_data_path}/layers/{feature_name}/layer.png"
-            )
-
-            layer_window_sizes = [ 2, 3, 4, 6 ]
-
-            for layer_window_size in layer_window_sizes:
-                feature_window_data = apply_windowing(feature_layer_data, layer_window_size)
-
-                with open(f"results/{model_data_path}/layers/{feature_name}/window-size{layer_window_size}.json", "w") as window_data_file:
-                    json.dump(feature_window_data, window_data_file)
+                with open(f"results/{model_data_path}/layers/{feature_name}/layer.json", "w") as layer_data_file:
+                    json.dump(feature_layer_data, layer_data_file)
 
                 plot_layer_data(
-                    f"{feature_name}\n(Average Normalized Attention Mass Per {layer_window_size} Layer Window)",
-                    "Average Normalized Attention Mass Per Window",
-                    feature_window_data,
-                    f"results/{model_data_path}/layers/{feature_name}/window-size{layer_window_size}.png"
+                    f"{feature_name}\n(Average Normalized Feature Attention Per Layer)",
+                    "Average Normalized Feature Attention Per Layer",
+                    feature_layer_data,
+                    f"results/{model_data_path}/layers/{feature_name}/layer.png"
                 )
 
-    data_file_paths = [ "layer", "window-size2", "window-size3", "window-size4", "window-size6" ]
+                layer_window_sizes = [ 2, 3, 4, 6 ]
+
+                for layer_window_size in layer_window_sizes:
+                    feature_window_data = apply_windowing(feature_layer_data, layer_window_size)
+
+                    with open(f"results/{model_data_path}/layers/{feature_name}/window-size{layer_window_size}.json", "w") as window_data_file:
+                        json.dump(feature_window_data, window_data_file)
+
+                    plot_layer_data(
+                        f"{feature_name}\n(Average Normalized Feature Attention Per {layer_window_size} Layer Window)",
+                        "Average Normalized Feature Attention Per Window",
+                        feature_window_data,
+                        f"results/{model_data_path}/layers/{feature_name}/window-size{layer_window_size}.png",
+                        layer_window_size=layer_window_size
+                    )
+
+    data_file_paths = [
+        ("layer", "Layer", 1),
+        ("window-size2", "Window", 2),
+        ("window-size3", "Window", 3),
+        ("window-size4", "Window", 4),
+        ("window-size6", "Window", 6)
+    ]
 
     for feature_name in os.listdir(f"results/base-model/layers"):
         if os.path.isdir(f"results/ft-model/layers/{feature_name}"):
             os.makedirs(f"results/model-diffs/layers/{feature_name}", exist_ok=True)
 
-            for data_file_path in data_file_paths:
+            for (data_file_path, grouping_name, layer_window_size) in data_file_paths:
                 with open(f"results/base-model/layers/{feature_name}/{data_file_path}.json", "r") as base_model_data_file:
                     with open(f"results/ft-model/layers/{feature_name}/{data_file_path}.json", "r") as ft_model_data_file:
                         base_model_data = json.load(base_model_data_file)
@@ -113,8 +121,9 @@ if __name__ == "__main__":
                             json.dump(model_diffs_data, diff_data_file)
 
                         plot_layer_data(
-                            f"{feature_name}\n(Difference Between Normalized Attention Mass in Fine Tuned vs Base Model)",
-                            "Normalized Attention Mass Per Window",
+                            f"{feature_name}\n(Difference Between Average Normalized Feature Attention in Fine Tuned vs Base Model)",
+                            f"Normalized Feature Attention Difference Per {grouping_name}",
                             model_diffs_data,
-                            f"results/model-diffs/layers/{feature_name}/{data_file_path}.png"
+                            f"results/model-diffs/layers/{feature_name}/{data_file_path}.png",
+                            layer_window_size=layer_window_size
                         )
