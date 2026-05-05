@@ -53,37 +53,37 @@ if __name__ == "__main__":
     os.makedirs("results/ablation-data/control/layer", exist_ok=True)
     os.makedirs("results/ablation-data/control/window", exist_ok=True)
 
-    # with reranker.using_device(reranker.base_model):
-        # evaluate_model(reranker.base_model, per_head[0], per_head[1], "results/ablation-data/control/head/base-model.json")
-        # evaluate_model(reranker.base_model, per_layer[0], per_layer[1], "results/ablation-data/control/layer/base-model.json")
-        # evaluate_model(reranker.base_model, per_window[0], per_window[1], "results/ablation-data/control/window/base-model.json")
+    with reranker.using_device(reranker.base_model):
+        evaluate_model(reranker.base_model, per_head[0], per_head[1], "results/ablation-data/control/head/base-model.json")
+        evaluate_model(reranker.base_model, per_layer[0], per_layer[1], "results/ablation-data/control/layer/base-model.json")
+        evaluate_model(reranker.base_model, per_window[0], per_window[1], "results/ablation-data/control/window/base-model.json")
 
     with reranker.using_device(reranker.ft_model):
-        # evaluate_model(reranker.ft_model, per_head[0], per_head[1], "results/ablation-data/control/head/ft-model.json")
-        # evaluate_model(reranker.ft_model, per_layer[0], per_layer[1], "results/ablation-data/control/layer/ft-model.json")
-        # evaluate_model(reranker.ft_model, per_window[0], per_window[1], "results/ablation-data/control/window/ft-model.json")
+        evaluate_model(reranker.ft_model, per_head[0], per_head[1], "results/ablation-data/control/head/ft-model.json")
+        evaluate_model(reranker.ft_model, per_layer[0], per_layer[1], "results/ablation-data/control/layer/ft-model.json")
+        evaluate_model(reranker.ft_model, per_window[0], per_window[1], "results/ablation-data/control/window/ft-model.json")
 
         print("Heads")
 
         os.makedirs("results/ablation-data/omit-head", exist_ok=True)
         os.makedirs("results/ablation-data/keep-head", exist_ok=True)
 
-        # for layer_index in range(reranker.ft_model.config.num_hidden_layers):
-        #     for head_index in range(reranker.ft_model.config.num_attention_heads):
-        #         print(f"\tOmit Layer {layer_index}, Head {head_index}")
+        for layer_index in range(reranker.ft_model.config.num_hidden_layers):
+            for head_index in range(reranker.ft_model.config.num_attention_heads):
+                print(f"\tOmit Layer {layer_index}, Head {head_index}")
 
-        #         with reranker.use_lora_ablated_model([ (layer_index, head_index) ]) as ablated_model:
-        #             evaluate_model(ablated_model, per_head[0], per_head[1], f"results/ablation-data/omit-head/layer{layer_index}-head{head_index}.json")
+                with reranker.use_lora_ablated_model([ (layer_index, head_index) ]) as ablated_model:
+                    evaluate_model(ablated_model, per_head[0], per_head[1], f"results/ablation-data/omit-head/layer{layer_index}-head{head_index}.json")
 
-        #         print(f"\tKeep Layer {layer_index}, Head {head_index}")
+                print(f"\tKeep Layer {layer_index}, Head {head_index}")
 
-        #         with reranker.use_lora_ablated_model([
-        #             (other_layer_index, other_head_index)
-        #             for other_head_index in range(reranker.ft_model.config.num_attention_heads)
-        #             for other_layer_index in range(reranker.ft_model.config.num_hidden_layers)
-        #             if not (other_layer_index == layer_index and other_head_index == head_index)
-        #         ]) as ablated_model:
-        #             evaluate_model(ablated_model, per_head[0], per_head[1], f"results/ablation-data/keep-head/layer{layer_index}-head{head_index}.json")
+                with reranker.use_lora_ablated_model([
+                    (other_layer_index, other_head_index)
+                    for other_head_index in range(reranker.ft_model.config.num_attention_heads)
+                    for other_layer_index in range(reranker.ft_model.config.num_hidden_layers)
+                    if not (other_layer_index == layer_index and other_head_index == head_index)
+                ]) as ablated_model:
+                    evaluate_model(ablated_model, per_head[0], per_head[1], f"results/ablation-data/keep-head/layer{layer_index}-head{head_index}.json")
 
         print("Layers")
 
