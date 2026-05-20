@@ -48,7 +48,7 @@ def attention_heatmap(output_file: str, title: str, tagged_tokens: list[tag.Tagg
             if (attending_index, attended_index) in scores:
                 is_feature, value = scores[(attending_index, attended_index)]
 
-                color = (0.0, 0.0, value) if attended_index == 0 else (value, 0.0, 0.0) if is_feature else (0.0, value, 0.0)
+                color = (0.0, 0.0, value) if attended_index == 0 else (0.0, value, 0.0) if is_feature else (value, 0.0, 0.0)
 
                 ax.add_patch(patches.Rectangle(
                     (tile_coords[attending_index][0], tile_coords[attended_index][0]),
@@ -73,8 +73,8 @@ def attention_heatmap(output_file: str, title: str, tagged_tokens: list[tag.Tagg
     ax.legend(handles=[
         matplotlib.lines.Line2D([], [], color="none", label="X-Axis: Attending Token"),
         matplotlib.lines.Line2D([], [], color="none", label="Y-Axis: Attended Token"),
-        patches.Patch(facecolor="red", label="Feature Attention"),
-        patches.Patch(facecolor="green", label="Non-Feature Attention"),
+        patches.Patch(facecolor="green", label="Feature Attention"),
+        patches.Patch(facecolor="red", label="Non-Feature Attention"),
         patches.Patch(facecolor="blue", label="Sink Attention"),
     ], fontsize=18, loc="upper left", bbox_to_anchor=(0.06, x - 0.3), bbox_transform=ax.transData)
 
@@ -103,7 +103,7 @@ def transformer_heatmap(output_file: str, title: str, head_data: list[list[float
     cell_size = 0.25
     gap = 0.05
 
-    green_white_red = mcolors.LinearSegmentedColormap.from_list("black_red", ["green", "white", "red"])
+    red_white_green = mcolors.LinearSegmentedColormap.from_list("red_white_green", ["red", "white", "green"])
     norm = mcolors.TwoSlopeNorm(vmin=-1, vcenter=0, vmax=1)
 
     fig, ax = plt.subplots(figsize=(num_attention_layers * (cell_size + gap) - gap, num_attention_heads * (cell_size + gap) - gap))
@@ -114,7 +114,7 @@ def transformer_heatmap(output_file: str, title: str, head_data: list[list[float
                 (attention_layer_index * (cell_size + gap), attention_head_index * (cell_size + gap)),
                 cell_size,
                 cell_size,
-                color=green_white_red(norm(head_data[attention_layer_index][attention_head_index]))
+                color=red_white_green(norm(head_data[attention_layer_index][attention_head_index]))
             ))
 
     ax.set_title(title, pad=15)
@@ -122,9 +122,9 @@ def transformer_heatmap(output_file: str, title: str, head_data: list[list[float
     ax.set_ylabel("Attention Head", labelpad=10)
 
     ax.set_xticks([col * (cell_size + gap) + 0.5 * cell_size for col in range(num_attention_layers)])
-    ax.set_xticklabels(range(num_attention_layers))
+    ax.set_xticklabels(range(1, num_attention_layers + 1))
     ax.set_yticks([row * (cell_size + gap) + 0.5 * cell_size for row in range(num_attention_heads)])
-    ax.set_yticklabels(range(num_attention_heads))
+    ax.set_yticklabels(range(1, num_attention_heads + 1))
 
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -134,7 +134,7 @@ def transformer_heatmap(output_file: str, title: str, head_data: list[list[float
     ax.set_xlim(-gap, num_attention_layers * (cell_size + gap) - gap)
     ax.set_ylim(-gap, num_attention_heads * (cell_size + gap) - gap)
 
-    sm = plt.cm.ScalarMappable(cmap=green_white_red, norm=norm)
+    sm = plt.cm.ScalarMappable(cmap=red_white_green, norm=norm)
     sm.set_array([])
     cbar = plt.colorbar(sm, ax=ax, orientation="vertical", fraction=0.02, pad=0.04)
     cbar.set_ticks([ -1, 0, 1 ])
@@ -183,6 +183,12 @@ def example_heatmap(model, tuning_name):
 
         composite_feature2 = "Very Rare Document Tokens Attending Query Tokens"
         attention_heatmap(f"results/{tuning_name}/attention-heatmaps/2.png", f"{composite_feature2}\n{model_name}, Layer 16, Head 17", all_tagged_tokens, attention_layers[16, 17, :, :], composite_feature_table.get(composite_feature2))
+
+        composite_feature3 = "All Tokens Attending Rare Tokens"
+        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/3.png", f"{composite_feature3}\n{model_name}, Layer 8, Head 6", all_tagged_tokens, attention_layers[8, 6, :, :], composite_feature_table.get(composite_feature3))
+
+        composite_feature4 = "All Tokens Attending Lexical Match Tokens"
+        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/4.png", f"{composite_feature4}\n{model_name}, Layer 16, Head 17", all_tagged_tokens, attention_layers[16, 17, :, :], composite_feature_table.get(composite_feature4))
 
 if __name__ == "__main__":
     example_heatmap(reranker.base_model, "base-model")

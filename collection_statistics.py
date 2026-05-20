@@ -14,7 +14,8 @@ if (
     Path(sys.modules['__main__'].__file__).name not in [
         "calculate_model_diffs.py",
         "evaluate_model.py",
-        "analyze_ablations.py"
+        "analyze_ablations.py",
+        "causality.py"
     ]
 ):
     
