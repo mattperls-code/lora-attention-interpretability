@@ -149,8 +149,8 @@ def transformer_heatmap(output_file: str, title: str, head_data: list[list[float
 
 def example_heatmap(model, tuning_name):
     with reranker.using_device(model) as reranker_model:
-        query_text = "query: Are house cats the same species as lions?"
-        document_text = "document: Lions, tigers, and panthers all belong to the same family."
+        query_text = "query: What is inverse document frequency?"
+        document_text = "document: Rare words have a higher IDF due to lower document frequency."
 
         tagged_query_tokens = tag.generate_tagged_tokens(query_text, [
             tag.tag_query,
@@ -179,16 +179,19 @@ def example_heatmap(model, tuning_name):
         model_name = "Base Model" if tuning_name == "base-model" else "Fine-Tuned Model"
 
         composite_feature1 = "Rare Tokens Attending Rare Semantic Match Tokens"
-        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/1.png", f"{composite_feature1}\n{model_name}, Layer 8, Head 6", all_tagged_tokens, attention_layers[8, 6, :, :], composite_feature_table.get(composite_feature1))
+        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/1.png", f"{composite_feature1}\n{model_name}, Layer 9, Head 7", all_tagged_tokens, attention_layers[8, 6, :, :], composite_feature_table.get(composite_feature1))
 
         composite_feature2 = "Very Rare Document Tokens Attending Query Tokens"
-        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/2.png", f"{composite_feature2}\n{model_name}, Layer 16, Head 17", all_tagged_tokens, attention_layers[16, 17, :, :], composite_feature_table.get(composite_feature2))
+        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/2.png", f"{composite_feature2}\n{model_name}, Layer 17, Head 18", all_tagged_tokens, attention_layers[16, 17, :, :], composite_feature_table.get(composite_feature2))
 
         composite_feature3 = "All Tokens Attending Rare Tokens"
-        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/3.png", f"{composite_feature3}\n{model_name}, Layer 8, Head 6", all_tagged_tokens, attention_layers[8, 6, :, :], composite_feature_table.get(composite_feature3))
+        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/3.png", f"{composite_feature3}\n{model_name}, Layer 9, Head 7", all_tagged_tokens, attention_layers[8, 6, :, :], composite_feature_table.get(composite_feature3))
 
         composite_feature4 = "All Tokens Attending Lexical Match Tokens"
-        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/4.png", f"{composite_feature4}\n{model_name}, Layer 16, Head 17", all_tagged_tokens, attention_layers[16, 17, :, :], composite_feature_table.get(composite_feature4))
+        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/4.png", f"{composite_feature4}\n{model_name}, Layer 9, Head 8", all_tagged_tokens, attention_layers[8, 7, :, :], composite_feature_table.get(composite_feature4))
+
+        composite_feature5 = "Document Tokens Attending Query Tokens"
+        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/5.png", f"{composite_feature5}\n{model_name}, Layer 20, Head 15", all_tagged_tokens, attention_layers[19, 14, :, :], composite_feature_table.get(composite_feature5))
 
 if __name__ == "__main__":
     example_heatmap(reranker.base_model, "base-model")

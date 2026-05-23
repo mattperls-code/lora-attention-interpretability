@@ -67,11 +67,11 @@ if (
     idf_values = [ math.log(collection_doc_count / (word_freq + 1)) for word_freq in word_doc_freq.values() ]
     idf_values.sort()
 
-    empirical_rarity_threshold = int(len(idf_values) * 0.01)
+    empirical_rarity_threshold = 182
     empirical_idf_theshold = idf_values[empirical_rarity_threshold]
 
     def idf_range(score: float):
-        return "low" if score < empirical_idf_theshold else "high"
+        return "low" if score < math.log(1000 / 25) else "high"
 
             # OLD
 
@@ -107,29 +107,34 @@ if (
 if __name__ == "__main__":
     percent_values = [ 100 * idf_index / len(idf_values) for idf_index in range(len(idf_values)) ]
 
-    frac_thresholds = [ 0.1, 0.2, 0.5, 1, 2, 5, 10, 20 ]
+    frac_thresholds = [ 0.01, 0.02, 0.03, 0.04, 0.05, 0.07, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20 ]
 
     for frac_threshold in frac_thresholds:
         threshold_index = int(len(idf_values) * frac_threshold / 100)
 
         print(f"{frac_threshold}% of words have idf below {idf_values[threshold_index]}")
 
+    print(f"total num words: {len(idf_values)}")
+    print(f"index of old 25/1000 docs: {next(i for i, idf in enumerate(idf_values) if idf >= math.log(1000/25))}")
+
     idf_threshold_index = next(i for i, idf in enumerate(idf_values) if idf >= empirical_idf_theshold)
     percent_rarer_than_threshold = 100 * (len(idf_values) - idf_threshold_index) / len(idf_values)
     
     plt.clf()
     plt.plot(idf_values, percent_values)
+    plt.title("Empirical Metrics For Word Rarity", pad=10)
     plt.xlabel("Inverse Document Frequency")
     plt.ylabel("Percent Of Words Below IDF")
     plt.axvline(x=empirical_idf_theshold, color='red', linestyle=':', label=f'Empirical Rare Word Threshold')
     plt.axhline(y=100 - percent_rarer_than_threshold, color='black', linestyle=':', alpha=0.2)
     plt.annotate(
-        f'{percent_rarer_than_threshold:.1f}% of Words Are More Rare',
+        f'{percent_rarer_than_threshold:.3f}% of Words Are More Rare',
         xy=(empirical_idf_theshold, 100 - percent_rarer_than_threshold),
-        xytext=(empirical_idf_theshold - 0.5, 100 - percent_rarer_than_threshold + 8),
+        xytext=(empirical_idf_theshold + 0.5, 100 - percent_rarer_than_threshold + 8),
         arrowprops=dict(arrowstyle='->', color='red'),
         color='red',
-        ha='right'
+        ha='left'
     )
     plt.legend()
-    plt.show()
+    plt.savefig("results/empirical-rarity-threshold.png")
+    plt.close()
