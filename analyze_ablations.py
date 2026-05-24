@@ -280,8 +280,8 @@ def analyze_window_ablations():
             )
 
 if __name__ == "__main__":
-    base_model_evaluation_scores = analyze_ablation("results/ablation-data/control/layer/base-model.json")
-    ft_model_evaluation_scores = analyze_ablation("results/ablation-data/control/layer/ft-model.json")
+    base_model_evaluation_scores = analyze_ablation("results/ablation-data/control/head/base-model.json")
+    ft_model_evaluation_scores = analyze_ablation("results/ablation-data/control/head/ft-model.json")
 
     print(base_model_evaluation_scores)
     print(ft_model_evaluation_scores)
