@@ -8,7 +8,6 @@ import reranker
 import math
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-import numpy as np
 
 collection = ir_datasets.load("msmarco-passage/train")
 

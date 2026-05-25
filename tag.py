@@ -44,6 +44,7 @@ def tokenize(text: str, start_index: int):
     
     return [ TaggedToken(index + start_index, id, start, end, text[start : end]) for index, (id, (start, end)) in enumerate(zip(tokens["input_ids"], tokens["offset_mapping"])) ]
 
+# https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.8.0/en_core_web_trf-3.8.0-py3-none-any.whl
 pos_tagger = spacy.load("en_core_web_trf", disable=["parser", "ner", "lemmatizer"])
 
 def tag_pos(tagged_tokens: list[TaggedToken], text: str):
