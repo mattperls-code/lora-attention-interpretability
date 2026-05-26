@@ -188,10 +188,10 @@ def example_heatmap(model, tuning_name):
         attention_heatmap(f"results/{tuning_name}/attention-heatmaps/3.png", f"{composite_feature3}\n{model_name}, Layer 9, Head 7", all_tagged_tokens, attention_layers[8, 6, :, :], composite_feature_table.get(composite_feature3))
 
         composite_feature4 = "All Tokens Attending Rare Tokens"
-        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/4.png", f"{composite_feature4}\n{model_name}, Layer 25, Head 6", all_tagged_tokens, attention_layers[24, 5, :, :], composite_feature_table.get(composite_feature4))
+        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/4.png", f"{composite_feature4}\n{model_name}, Layer 17, Head 3", all_tagged_tokens, attention_layers[16, 2, :, :], composite_feature_table.get(composite_feature4))
 
         composite_feature5 = "Document Tokens Attending Query Tokens"
-        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/5.png", f"{composite_feature5}\n{model_name}, Layer 18, Head 19", all_tagged_tokens, attention_layers[17, 18, :, :], composite_feature_table.get(composite_feature5))
+        attention_heatmap(f"results/{tuning_name}/attention-heatmaps/5.png", f"{composite_feature5}\n{model_name}, Layer 9, Head 7", all_tagged_tokens, attention_layers[8, 6, :, :], composite_feature_table.get(composite_feature5))
 
 if __name__ == "__main__":
     example_heatmap(reranker.base_model, "base-model")
